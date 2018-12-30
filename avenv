@@ -1,0 +1,62 @@
+#!/bin/sh
+
+set -eu
+
+if [ $# -ne 1 ]; then
+  echo "usage: avenv VENV-DIR"
+  exit 1
+fi
+
+venv=$(realpath "$1")
+
+mkdir "$venv"
+mkdir "$venv/bin"
+mkdir "$venv/bin/rootfs"
+
+#alpha.de.repo.voidlinux.org/live/current/sha256sums.txt
+fname=$(curl -'#' -L --fail https://alpha.de.repo.voidlinux.org/live/current/sha256sums.txt \
+        | awk '{print $2}' | grep 'x86_64-ROOTFS-' | head -n1)
+
+cd "$venv/bin/rootfs"
+curl -'#' -L --fail "http://alpha.de.repo.voidlinux.org/live/current/$fname" | tar --no-same-owner -xJf -
+#curl --fail -L http://dl-cdn.alpinelinux.org/alpine/v3.8/releases/x86_64/alpine-minirootfs-3.8.2-x86_64.tar.gz | tar --no-same-owner -xzf - --exclude ./dev
+cd - 2> /dev/null
+
+curl -'#' -L --fail "https://github.com/ihucos/bchroot/raw/master/bchroot" > $venv/bchroot
+chmod 744 $venv/bchroot
+
+rm -f $venv/bin/rootfs/etc/resolv.conf
+cp /etc/resolv.conf $venv/bin/rootfs/etc/resolv.conf
+
+"$venv/bchroot" "$venv/bin/rootfs" sh -exc '
+xbps-install -Sy curl python3
+curl -L --fail https://bootstrap.pypa.io/get-pip.py | python
+'
+
+echo "#/bin/sh
+cd $venv/bin/rootfs
+find ./usr/local/bin ./usr/bin ./bin ./usr/local/sbin ./usr/sbin ./sbin 2> /dev/null \
+| xargs -n 1 basename | sort | uniq \
+| xargs -I{} sh -c \"ln -f $venv/bchroot $venv/bin/{}\"
+" > "$venv/bin/avenv-update"
+chmod +x "$venv/bin/avenv-update"
+"$venv/bin/avenv-update"
+
+
+echo "
+alias python=$venv/bin/python
+alias pip=$venv/bin/pip
+alias python3=$venv/bin/python3
+alias pip3=$venv/bin/pip3
+
+PS1=\"($(basename "$venv")) "'$'"PS1\"
+
+deactivate(){
+  unalias python
+  unalias python3
+  unalias pip
+  unalias pip3
+  PS1=\""'$'"(echo \""'$'"PS1\" | cut -d ' ' -f2)\"
+  unset -f deactivate
+}
+" > "$venv/bin/activate"
