@@ -20,3 +20,13 @@ Tell your employer to stop using Macintosh
 
 ### No Python 2 support
 Life is no pony-ranage. It's over, no Python 2 support.
+
+### Does it run LibreOffice?
+Obviously
+```
+$ avenv venv # initialize the virtualenv
+...
+$ venv/bin/xbps-install -Sy libreoffice xorg-fonts # you can imagine that as kind of like a chrooted void linux
+...
+$ venv/bin/avenv-update # remap all executables in a PATH to venv/bin so you can call them comfortably
+$ venv/bin/libreoffice # run libreoffice
