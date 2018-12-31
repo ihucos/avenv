@@ -19,7 +19,7 @@ More isolation. You don't even need to have python installed.
 Tell your employer to stop using Macintosh
 
 ### No Python 2 support
-Life is no pony-ranage. It's over, no Python 2 support.
+Life is no Ponyhof. It's over, no Python 2 support.
 
 ### Does it run LibreOffice?
 Of course
