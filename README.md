@@ -22,7 +22,7 @@ Tell your employer to stop using Macintosh
 Life is no pony-ranage. It's over, no Python 2 support.
 
 ### Does it run LibreOffice?
-Obviously
+Of course
 ```
 $ avenv venv # initialize the virtualenv
 ...
@@ -30,3 +30,9 @@ $ venv/bin/xbps-install -Sy libreoffice xorg-fonts # you can imagine that as kin
 ...
 $ venv/bin/avenv-update # remap all executables in a PATH to venv/bin so you can call them comfortably
 $ venv/bin/libreoffice # run libreoffice
+```
+
+### Could I use this for other stuff?
+Yes, it's kind of based on this: https://github.com/ihucos/bchroot
+
+*cough* *cough* click on my super awesome container engine I want people to use: https://github.com/ihucos/plash *aham*
