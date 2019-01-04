@@ -13,25 +13,26 @@ mkdir "$venv"
 mkdir "$venv/bin"
 mkdir "$venv/bin/rootfs"
 
-#alpha.de.repo.voidlinux.org/live/current/sha256sums.txt
-fname=$(curl -'#' -L --fail https://alpha.de.repo.voidlinux.org/live/current/sha256sums.txt \
-        | awk '{print $2}' | grep 'x86_64-ROOTFS-' | head -n1)
+# ubuntu 18.04 currently
+# FIXME: use https or check the hash or so!
+ROOTFS_URL="http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04-base-amd64.tar.gz"
 
 cd "$venv/bin/rootfs"
-curl -'#' -L --fail "http://alpha.de.repo.voidlinux.org/live/current/$fname" | tar --no-same-owner -xJf -
-#curl --fail -L http://dl-cdn.alpinelinux.org/alpine/v3.8/releases/x86_64/alpine-minirootfs-3.8.2-x86_64.tar.gz | tar --no-same-owner -xzf - --exclude ./dev
-cd - 2> /dev/null
+curl -'#' -L --fail $ROOTFS_URL | tar --no-same-owner --exclude dev -xzf -
+cd - > /dev/null
+
+# we excluded it, but need an empty directory for the mount
+mkdir "$venv/bin/rootfs/dev"
 
 curl -'#' -L --fail "https://github.com/ihucos/bchroot/raw/master/bchroot" > $venv/bchroot
 chmod 744 $venv/bchroot
 
 rm -f $venv/bin/rootfs/etc/resolv.conf
+
+# redunancy, bchroot already attempts and bind mount
 cp /etc/resolv.conf $venv/bin/rootfs/etc/resolv.conf
 
-"$venv/bchroot" "$venv/bin/rootfs" sh -exc '
-xbps-install -Sy curl python3
-curl -L --fail https://bootstrap.pypa.io/get-pip.py | python
-'
+echo 'APT::Sandbox::User "root";' > $venv/bin/rootfs/etc/apt/apt.conf.d/90stayroot
 
 echo "#/bin/sh
 cd $venv/bin/rootfs
@@ -40,8 +41,16 @@ find ./usr/local/bin ./usr/bin ./bin ./usr/local/sbin ./usr/sbin ./sbin 2> /dev/
 | xargs -I{} sh -c \"ln -f $venv/bchroot $venv/bin/{}\"
 " > "$venv/bin/avenv-update"
 chmod +x "$venv/bin/avenv-update"
-"$venv/bin/avenv-update"
 
+"$venv/bchroot" "$venv/bin/rootfs" sh -ec '
+apt-get update
+apt-get install -y --no-install-recommends curl python3-pip
+j 2>&1 | while read l
+do 
+  echo "avenv: $l"
+done
+
+"$venv/bin/avenv-update"
 
 echo "
 alias python=$venv/bin/python
