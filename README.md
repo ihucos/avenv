@@ -3,7 +3,7 @@ A more isolated virtualenv
 
 ## Install / Update
 ```
-curl --fail --location https://github.com/ihucos/avenv/raw/master/avenv-dist.tar | tar -xf - -C /usr/local/bin/
+curl --fail --location https://github.com/ihucos/avenv/releases/download/0.1/avenv-dist.tar | tar -xf - -C /usr/local/bin/
 ```
 
 ### How to use
