@@ -21,12 +21,16 @@ Tell your employer to stop using Macintosh
 ### No Python 2 support
 Life is no Ponyhof. It's over, no Python 2 support.
 
+### I can't setuid/setgid inside my container
+Ensure you have newuidmap/newgidmap installed and that our user have some
+uids/gids in /etc/subuid and/or /set/subgid. Apt for example needs this.
+
 ### Does it run LibreOffice?
 Of course
 ```
 $ avenv venv # initialize the virtualenv
 ...
-$ venv/bin/xbps-install -Sy libreoffice xorg-fonts # you can imagine that as kind of like a chrooted void linux
+$ venv/bin/apt-get update # you can imagine that as kind of like a chrooted ubuntu linux
 ...
 $ venv/bin/avenv-update # remap all executables in a PATH to venv/bin so you can call them comfortably
 $ venv/bin/libreoffice # run libreoffice
