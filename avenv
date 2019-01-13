@@ -2,6 +2,12 @@
 
 set -eu
 
+
+# ubuntu 18.04 currently
+# FIXME: use https or check the hash or so!
+ROOTFS_URL="http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04-base-amd64.tar.gz"
+
+
 if [ $# -ne 1 ]; then
   echo "usage: avenv VENV-DIR"
   exit 1
@@ -13,26 +19,23 @@ mkdir "$venv"
 mkdir "$venv/bin"
 mkdir "$venv/bin/rootfs"
 
-# ubuntu 18.04 currently
-# FIXME: use https or check the hash or so!
-ROOTFS_URL="http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04-base-amd64.tar.gz"
+
+curl -'#' -L --fail "https://github.com/ihucos/bchroot/releases/download/0.2/bchroot" > $venv/bchroot
+chmod 744 $venv/bchroot
+
+curl -'#' -L --fail "https://github.com/ihucos/bchroot/releases/download/0.2/zudo" > $venv/zumo
+chmod 744 $venv/zumo
 
 cd "$venv/bin/rootfs"
-curl -'#' -L --fail $ROOTFS_URL | tar --no-same-owner --exclude dev -xzf -
+curl -'#' -L --fail $ROOTFS_URL | $venv/zumo tar --exclude dev -xzf -
 cd - > /dev/null
 
 # we excluded it, but need an empty directory for the mount
 mkdir "$venv/bin/rootfs/dev"
 
-curl -'#' -L --fail "https://github.com/ihucos/bchroot/raw/master/bchroot" > $venv/bchroot
-chmod 744 $venv/bchroot
-
-rm -f $venv/bin/rootfs/etc/resolv.conf
-
 # redunancy, bchroot already attempts and bind mount
+rm -f $venv/bin/rootfs/etc/resolv.conf
 cp /etc/resolv.conf $venv/bin/rootfs/etc/resolv.conf
-
-echo 'APT::Sandbox::User "root";' > $venv/bin/rootfs/etc/apt/apt.conf.d/90stayroot
 
 echo "#/bin/sh
 cd $venv/bin/rootfs
@@ -42,14 +45,9 @@ find ./usr/local/bin ./usr/bin ./bin ./usr/local/sbin ./usr/sbin ./sbin 2> /dev/
 " > "$venv/bin/avenv-update"
 chmod +x "$venv/bin/avenv-update"
 
-"$venv/bchroot" "$venv/bin/rootfs" sh -ec '
-apt-get update
-apt-get install -y --no-install-recommends curl python3-pip
-j 2>&1 | while read l
-do 
-  echo "avenv: $l"
-done
-
+"$venv/bin/avenv-update"
+"$venv/bin/apt-get" update
+"$venv/bin/apt-get" install -y --no-install-recommends curl python3-pip
 "$venv/bin/avenv-update"
 
 echo "
