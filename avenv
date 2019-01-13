@@ -20,14 +20,14 @@ mkdir "$venv/bin"
 mkdir "$venv/bin/rootfs"
 
 
-curl -'#' -L --fail "https://github.com/ihucos/bchroot/releases/download/0.2/bchroot" > $venv/bchroot
+curl -'#' -L --fail "https://github.com/ihucos/bchroot/releases/download/0.3/bchroot" > $venv/bchroot
 chmod 744 $venv/bchroot
 
-curl -'#' -L --fail "https://github.com/ihucos/bchroot/releases/download/0.2/zudo" > $venv/zumo
-chmod 744 $venv/zumo
+curl -'#' -L --fail "https://github.com/ihucos/bchroot/releases/download/0.3/zudo" > $venv/zudo
+chmod 744 $venv/zudo
 
 cd "$venv/bin/rootfs"
-curl -'#' -L --fail $ROOTFS_URL | $venv/zumo tar --exclude dev -xzf -
+curl -'#' -L --fail $ROOTFS_URL | $venv/zudo tar --exclude dev -xzf -
 cd - > /dev/null
 
 # we excluded it, but need an empty directory for the mount
