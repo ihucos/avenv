@@ -21,8 +21,8 @@ Tell your employer to stop using Macintosh
 ### No Python 2 support
 Life is no Ponyhof. It's over, no Python 2 support.
 
-### I can't setuid/setgid inside my container
-Ensure you have newuidmap/newgidmap installed and that our user have some
+### I can't setuid/setgid inside my venv.
+Ensure you have newuidmap/newgidmap installed and that your user have some
 uids/gids in /etc/subuid and/or /set/subgid. Apt for example needs this.
 
 ### Does it run LibreOffice?
