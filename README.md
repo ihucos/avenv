@@ -31,6 +31,7 @@ Of course
 $ avenv venv # initialize the virtualenv
 ...
 $ venv/bin/apt-get update # you can imagine that as kind of like a chrooted ubuntu linux
+$ venv/bin/apt-get install libreoffice
 ...
 $ venv/bin/avenv-update # remap all executables in a PATH to venv/bin so you can call them comfortably
 $ venv/bin/libreoffice # run libreoffice
